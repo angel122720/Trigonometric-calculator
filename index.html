@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Trig Identity Helper</title>
+    <script src="https://cloudflare.com"></script>
+    <style>
+        :root {
+            --blue: #d1d9ff; --green: #d4edda; --purple: #f3e5f5;
+            --red: #f8d7da; --yellow: #fff3cd; --orange: #ffe5d9;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .main-layout { display: flex; gap: 20px; max-width: 1000px; width: 100%; flex-wrap: wrap; }
+        
+        /* Calculator Style */
+        .calculator-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); flex: 1; min-width: 350px; border-top: 10px solid #3498db; }
+        h1 { color: #2c3e50; text-align: center; font-size: 24px; }
+        .input-group { margin-bottom: 20px; }
+        label { font-weight: bold; color: #555; display: block; margin-bottom: 8px; }
+        input { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 10px; font-size: 18px; transition: 0.3s; box-sizing: border-box; }
+        input:focus { border-color: #3498db; outline: none; background: #faffff; }
+        
+        button { width: 100%; padding: 15px; background: #3498db; color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        button:hover { background: #2980b9; transform: translateY(-2px); }
+
+        #result { margin-top: 20px; padding: 20px; border-radius: 10px; text-align: center; font-weight: bold; display: none; animation: fadeIn 0.5s; }
+        
+        /* Cheat Sheet Style */
+        .formula-sidebar { flex: 0.6; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; min-width: 300px; }
+        .card { padding: 15px; border-radius: 10px; font-size: 0.85em; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .card h4 { margin: 0 0 10px 0; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 5px; }
+        .blue { background: var(--blue); } .green { background: var(--green); }
+        .purple { background: var(--purple); } .orange { background: var(--orange); }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<h1>📐 Trigonometric Identity Verifier</h1>
+<p>BSED Mathematics: Technology in Teaching and Learning Project</p>
+
+<div class="main-layout">
+    <!-- CALCULATOR -->
+    <div class="calculator-card">
+        <div class="input-group">
+            <label>Left-Hand Side (LHS):</label>
+            <input type="text" id="lhs" placeholder="e.g., sin(x)/cos(x)" oninput="clearResult()">
+        </div>
+        <div style="text-align: center; font-size: 24px; margin-bottom: 10px;">=</div>
+        <div class="input-group">
+            <label>Right-Hand Side (RHS):</label>
+            <input type="text" id="rhs" placeholder="e.g., tan(x)" oninput="clearResult()">
+        </div>
+        Check Identity</button>
+        <div id="result"></div>
+        <p style="font-size: 12px; color: #888; margin-top: 15px;">Tip: Use <b>sin(x)^2</b> for sin²θ and <b>x</b> for θ.</p>
+    </div>
+
+    <!-- FORMULA REFERENCE (Para sa Students) -->
+    <div class="formula-sidebar">
+        <div class="card blue">
+            <h4>Quotient</h4>
+            tan θ = sin θ / cos θ<br>
+            cot θ = cos θ / sin θ
+        </div>
+        <div class="card green">
+            <h4>Reciprocal</h4>
+            csc θ = 1 / sin θ<br>
+            sec θ = 1 / cos θ
+        </div>
+        <div class="card purple">
+            <h4>Pythagorean</h4>
+            sin²θ + cos²θ = 1<br>
+            1 + tan²θ = sec²θ
+        </div>
+        <div class="card orange">
+            <h4>Co-Function</h4>
+            sin(π/2 - θ) = cos θ<br>
+            cos(π/2 - θ) = sin θ
+        </div>
+    </div>
+</div>
+
+<script>
+    function clearResult() {
+        document.getElementById('result').style.display = 'none';
+    }
+
+    function checkIdentity() {
+        const lhs = document.getElementById('lhs').value.toLowerCase();
+        const rhs = document.getElementById('rhs').value.toLowerCase();
+        const resDiv = document.getElementById('result');
+
+        if(!lhs || !rhs) return;
+
+        try {
+            // Test with 3 different angles to be sure (in radians)
+            const testAngles = [0.5, 1.2, 2.5]; 
+            let isCorrect = true;
+
+            testAngles.forEach(theta => {
+                // Math.js evaluates the string expression
+                let valL = math.evaluate(lhs, { x: theta, sin: Math.sin, cos: Math.cos, tan: Math.tan, sec: (a)=>1/Math.cos(a), csc: (a)=>1/Math.sin(a), cot: (a)=>1/Math.tan(a) });
+                let valR = math.evaluate(rhs, { x: theta, sin: Math.sin, cos: Math.cos, tan: Math.tan, sec: (a)=>1/Math.cos(a), csc: (a)=>1/Math.sin(a), cot: (a)=>1/Math.tan(a) });
+                
+                if (Math.abs(valL - valR) > 0.0001) isCorrect = false;
+            });
+
+            resDiv.style.display = "block";
+            if (isCorrect) {
+                resDiv.innerHTML = "✨ Correct Identity! ✨<br>The graphs and values match perfectly.";
+                resDiv.style.background = "#d4edda"; resDiv.style.color = "#155724";
+            } else {
+                resDiv.innerHTML = "❌ Not an Identity<br>Try checking your signs or formulas.";
+                resDiv.style.background = "#f8d7da"; resDiv.style.color = "#721c24";
+            }
+        } catch (e) {
+            resDiv.style.display = "block";
+            resDiv.innerHTML = "⚠️ Typo Error!<br>Make sure to use brackets, e.g., sin(x).";
+            resDiv.style.background = "#fff3cd"; resDiv.style.color = "#856404";
+        }
+    }
+</script>
+
+</body>
+</html>
