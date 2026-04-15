@@ -4,72 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trig Identity Verifier</title>
-    <!-- Library para sa Math Logic -->
-    <script src="https://unpkg.com"></script>
+    <!-- Mas mabilis na link para sa Math Library -->
+    <script src="https://cloudflare.com"></script>
     <style>
         :root { --blue: #d1d9ff; --green: #d4edda; --purple: #f3e5f5; --orange: #ffe5d9; }
         body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .main-layout { display: flex; gap: 20px; max-width: 1000px; width: 100%; flex-wrap: wrap; justify-content: center; }
-        
-        /* Calculator Area */
-        .calculator-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); flex: 1; min-width: 350px; border-top: 10px solid #3498db; }
+        .main-layout { display: flex; gap: 20px; max-width: 900px; width: 100%; flex-wrap: wrap; justify-content: center; }
+        .calculator-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); flex: 1; min-width: 320px; border-top: 10px solid #1a4a72; }
+        h1 { color: #1a4a72; margin-bottom: 5px; }
         input { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 10px; font-size: 18px; box-sizing: border-box; margin-bottom: 10px; }
-        
-        /* Eto yung Button na dapat i-click */
-        .check-btn { width: 100%; padding: 15px; background: #3498db; color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .check-btn:hover { background: #2980b9; }
-
+        .check-btn { width: 100%; padding: 15px; background: #1a4a72; color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         #result { margin-top: 20px; padding: 20px; border-radius: 10px; text-align: center; font-weight: bold; display: none; }
-        
-        /* Sidebar Styles */
         .formula-sidebar { flex: 0.6; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; min-width: 300px; }
         .card { padding: 15px; border-radius: 10px; font-size: 0.85em; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .blue { background: var(--blue); } .green { background: var(--green); }
-        .purple { background: var(--purple); } .orange { background: var(--orange); }
     </style>
 </head>
 <body>
 
-<h1>⚠️ Trigonometric Identity Verifier</h1>
+<h1>Trig Identity Verifier</h1>
 <p>BSED Mathematics: TTL Project</p>
 
 <div class="main-layout">
     <div class="calculator-card">
-        <label><b>Left-Hand Side (LHS):</b></label>
-        <input type="text" id="lhs" placeholder="e.g., sin(x) / cos(x)">
-        <div style="text-align: center; font-size: 20px;">=</div>
-        <label><b>Right-Hand Side (RHS):</b></label>
-        <input type="text" id="rhs" placeholder="e.g., tan(x)">
-        
-        <!-- BUTTON - Siguraduhing ito ang iki-click -->
+        <label>Left-Hand Side (LHS):</label>
+        <input type="text" id="lhs" placeholder="sin(x) / cos(x)">
+        <div style="text-align: center; font-size: 20px; margin: 5px;">=</div>
+        <label>Right-Hand Side (RHS):</label>
+        <input type="text" id="rhs" placeholder="tan(x)">
         <button class="check-btn" onclick="verify()">Check Identity</button>
-        
         <div id="result"></div>
-        <p style="font-size: 11px; color: grey; margin-top: 10px;">Tip: Use x for &theta; and sin(x)^2 for sin&sup2;&theta;</p>
     </div>
 
     <div class="formula-sidebar">
-        <div class="card blue"><h4>Quotient</h4>tan x = sin x / cos x<br>cot x = cos x / sin x</div>
-        <div class="card green"><h4>Reciprocal</h4>csc x = 1 / sin x<br>sec x = 1 / cos x</div>
-        <div class="card purple"><h4>Pythagorean</h4>sin&sup2;x + cos&sup2;x = 1</div>
-        <div class="card orange"><h4>Co-Function</h4>sin(&pi;/2 - x) = cos x</div>
+        <div class="card blue"><b>Quotient</b><br>tan x = sin x / cos x</div>
+        <div class="card green"><b>Reciprocal</b><br>sec x = 1 / cos x</div>
+        <div class="card purple"><b>Pythagorean</b><br>sin²x + cos²x = 1</div>
+        <div class="card orange"><b>Co-Function</b><br>sin(π/2 - x) = cos x</div>
     </div>
 </div>
 
 <script>
     function verify() {
-        const lhsVal = document.getElementById('lhs').value.toLowerCase();
-        const rhsVal = document.getElementById('rhs').value.toLowerCase();
+        const lhsRaw = document.getElementById('lhs').value;
+        const rhsRaw = document.getElementById('rhs').value;
         const res = document.getElementById('result');
 
         try {
-            // Test angle: 1.2 radians
-            const testValue = { x: 1.2 };
-            const lEval = math.evaluate(lhsVal, testValue);
-            const rEval = math.evaluate(rhsVal, testValue);
+            // Nililinis ang input: tinatanggal ang extra spaces
+            const lhs = lhsRaw.toLowerCase().trim();
+            const rhs = rhsRaw.toLowerCase().trim();
+
+            if (!lhs || !rhs) {
+                alert("Please fill in both sides!");
+                return;
+            }
+
+            // Nagte-test sa tatlong magkaibang anggulo para sigurado (in radians)
+            const testAngles = [0.5, 1.2, 2.8];
+            let isCorrect = true;
+
+            testAngles.forEach(valX => {
+                const valL = math.evaluate(lhs, { x: valX });
+                const valR = math.evaluate(rhs, { x: valX });
+                if (Math.abs(valL - valR) > 0.001) isCorrect = false;
+            });
 
             res.style.display = "block";
-            if (Math.abs(lEval - rEval) < 0.001) {
+            if (isCorrect) {
                 res.innerHTML = "✅ CORRECT IDENTITY!";
                 res.style.background = "#d4edda"; res.style.color = "#155724";
             } else {
@@ -77,7 +78,7 @@
                 res.style.background = "#f8d7da"; res.style.color = "#721c24";
             }
         } catch (e) {
-            alert("Error! Please follow the format: sin(x)");
+            alert("Format Error! Use (x) and * for multiply.\nExample: 2 * sin(x)");
         }
     }
 </script>
